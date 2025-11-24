@@ -1,5 +1,4 @@
 #include "include/Caserma.hpp"
-#include "gestioneEccezioni.cpp"
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -45,10 +44,32 @@ int main() {
             }
 
             case 2: {
-                std::string tipo;
-                std::cout << "Inserisci tipo di mezzo (es: Jeep, Camion, Elicottero): ";
-                std::cin.ignore();
-                std::getline(std::cin, tipo);
+            
+                        std::cout << "Inserisci tipo di mezzo: ";
+                        std::cout << "1. Jeep" << std::endl;
+                        std::cout << "2. Camion" << std::endl;
+                        std::cout << "3. Elicottero" << std::endl;
+                        std::cout << "4. Carro Armato" << std::endl;
+                        std::cout << "5. Humvee" << std::endl;
+                        
+                        int tipoScelta=0;
+                        std::cout << "\nScelta: ";
+                        std::cin >> tipoScelta;
+                        if (std::cin.fail() || tipoScelta < 1 || tipoScelta > 5) {
+                            std::cout << "Input non valido.\n";
+                            continue;
+                        }
+                       
+                        std::string tipo;
+                        switch(tipoScelta)
+                        {
+                            case 1: tipo="Jeep"; break;
+                            case 2: tipo="Camion"; break;
+                            case 3: tipo="Elicottero"; break;
+                            case 4: tipo="Carro Armato"; break;
+                            case 5: tipo="Humvee"; break;
+                        }
+                         
                 int nuovoID=-1;
                 try {
                     nuovoID = gen.generaID();
@@ -57,10 +78,11 @@ int main() {
                     std::cout << "Errore nella generazione ID: " << e.what() << "\n";  //metodo della classe std::exeption che restituisce una stringa
                     break;
                 }
-                caserma.aggiungiMezzo(std::make_unique<Mezzo>(nuovoID, tipo));
+                caserma.aggiungiMezzo(std::make_unique<Mezzo>(nuovoID, tipo));  //aggiungere mezzo al conteiner
                 std::cout << "Mezzo aggiunto con ID " << nuovoID << "\n";
                 break;
-            }
+            
+        }
 
             case 3: {
                 std::string descrizione;
