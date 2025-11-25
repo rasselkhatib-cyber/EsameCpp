@@ -1,17 +1,11 @@
-#include <iostream>
-#include <set>
-#include <stdexcept>
-#include <cstdlib>
+#include "../include/Risorsa.hpp"
 
-class Risorsa {
+Risorsa::Risorsa(int id) : id(id), disponibile(true) {}
 
-    private:
-        int id ;
-        bool disponibile;
-    public:
-        Risorsa(int id ) :id(id),disponibile(true){}
-        int getId()const{return id;}
-        bool isDisponibile()const{return disponibile;}
-        void setDisponibile(bool disp){disponibile=disp;}       
 
-};
+int Risorsa::getId() const { return id; }
+
+bool Risorsa::isDisponibile() const { return disponibile; }
+
+void Risorsa::setDisponibile(bool disp) { disponibile = disp; }
+

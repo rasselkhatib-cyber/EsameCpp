@@ -13,10 +13,10 @@ class Risorsa {
         int id ;
         bool disponibile;
     public:
-        Risorsa(int id ) :id(id),disponibile(true){}
-        int getId()const{return id;}
-        bool isDisponibile()const{return disponibile;}
-        void setDisponibile(bool disp){disponibile=disp;}       
+        Risorsa(int id);
+        int getId() const;
+        bool isDisponibile() const;
+        void setDisponibile(bool disp);
 
 };
 

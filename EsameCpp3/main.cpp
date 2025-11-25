@@ -2,6 +2,10 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include "include/gestioneEccezioni.hpp"
+#include <set>
+#include <algorithm>
+#include <map>
 
 void menu();
 Grado scegliGrado();
@@ -33,19 +37,19 @@ int main() {
                 int nuovoID=-1;
                 try {
                     nuovoID =gen.generaID();
-                    std::cout<< "Generato ID: "  <<nuovoID << "\n";
+                    std::cout<< "\n\nGenerato ID: "  <<nuovoID << "\n";
                 }  catch (const std::exception& e) {
-                    std::cout << "Errore nella generazione ID: " << e.what() << "\n";  //metodo della classe std::exeption che restituisce una stringa
+                    std::cout << "\n\nErrore nella generazione ID: " << e.what() << "\n";  //metodo della classe std::exeption che restituisce una stringa
                     break;
                 }
                 caserma.aggiungiPersonale(std::make_unique<Personale>(nuovoID, nome, grado));
-                std::cout << "Personale aggiunto con ID " << nuovoID << "\n";
+                std::cout << "\n\nPersonale aggiunto con ID " << nuovoID << "\n";
                 break;
             }
 
             case 2: {
             
-                        std::cout << "Inserisci tipo di mezzo: ";
+                        std::cout << "Inserisci tipo di mezzo: \n";
                         std::cout << "1. Jeep" << std::endl;
                         std::cout << "2. Camion" << std::endl;
                         std::cout << "3. Elicottero" << std::endl;
@@ -55,8 +59,8 @@ int main() {
                         int tipoScelta=0;
                         std::cout << "\nScelta: ";
                         std::cin >> tipoScelta;
-                        if (std::cin.fail() || tipoScelta < 1 || tipoScelta > 5) {
-                            std::cout << "Input non valido.\n";
+                        if (std::cin.fail() || tipoScelta < 2 || tipoScelta > 6) {
+                            std::cout << "\n\nInput non valido.\n";
                             continue;
                         }
                        
@@ -75,11 +79,15 @@ int main() {
                     nuovoID = gen.generaID();
                     std::cout<< "Generato ID: "  <<nuovoID << "\n";
                 }  catch (const std::exception& e) {
-                    std::cout << "Errore nella generazione ID: " << e.what() << "\n";  //metodo della classe std::exeption che restituisce una stringa
+                    std::cout << "Errore nella generazione ID: " << e.what() << "\n";  
                     break;
                 }
-                caserma.aggiungiMezzo(std::make_unique<Mezzo>(nuovoID, tipo));  //aggiungere mezzo al conteiner
-                std::cout << "Mezzo aggiunto con ID " << nuovoID << "\n";
+                try {
+                    caserma.aggiungiMezzo(std::make_unique<Mezzo>(nuovoID, tipo));
+                    std::cout << "Mezzo aggiunto con ID " << nuovoID << "\n";
+                } catch (const std::exception& e) {
+                    std::cout << "Errore: " << e.what() << "\n";
+                }
                 break;
             
         }
@@ -104,7 +112,49 @@ int main() {
                 while (std::cin >> idm && idm != -1)
                     idMezzi.push_back(idm);
 
-                caserma.creaMissione(descrizione, idPersonale, idMezzi);
+                // Ora chiediamo per ogni mezzo quali personale della missione devono essere assegnati a quel mezzo
+                std::map<int, std::vector<int>> assegnamentiMezzi;
+                std::set<int> personaleAssegnatoGlobale;
+                for (int mezzoId : idMezzi) {
+                    std::cout << "Inserisci gli ID del personale da assegnare al mezzo " << mezzoId << " (termina con -1): ";
+                    int pid;
+                    std::vector<int> idPersonalePerMezzo;
+                    while (std::cin >> pid && pid != -1) {
+                        // Verifica che il pid sia stato selezionato tra quelli della missione
+                        if (std::find(idPersonale.begin(), idPersonale.end(), pid) == idPersonale.end()) {
+                            std::cout << "Errore: il personale con ID " << pid << " non è stato selezionato per la missione. Creazione fallita.\n";
+                            idPersonalePerMezzo.clear();
+                            personaleAssegnatoGlobale.clear();
+                            assegnamentiMezzi.clear();
+                            goto abort_missione;
+                        }
+                        // Verifica che non sia già assegnato ad altro mezzo
+                        if (personaleAssegnatoGlobale.count(pid) > 0) {
+                            std::cout << "Errore: il personale con ID " << pid << " è già assegnato ad un altro mezzo in questa missione. Creazione fallita.\n";
+                            idPersonalePerMezzo.clear();
+                            personaleAssegnatoGlobale.clear();
+                            assegnamentiMezzi.clear();
+                            goto abort_missione;
+                        }
+                        idPersonalePerMezzo.push_back(pid);
+                        personaleAssegnatoGlobale.insert(pid);
+                    }
+                    assegnamentiMezzi[mezzoId] = idPersonalePerMezzo;
+                }
+
+                // Controllo: verifica che ogni mezzo abbia almeno 2 e non più di 6 persone (e poi verificheremo la capienza del mezzo nel Caserma)
+                for (auto& kv : assegnamentiMezzi) {
+                    if (kv.second.size() < 2 || kv.second.size() > 6) {
+                        std::cout << "Errore: ogni mezzo deve avere almeno 2 e al massimo 6 persone assegnate. Creazione fallita.\n";
+                        goto abort_missione;
+                    }
+                }
+
+                caserma.creaMissione(descrizione, idPersonale, idMezzi, assegnamentiMezzi);
+                break;
+
+                abort_missione:
+                    ; // ritorna al menu principale
                 break;
             }
 

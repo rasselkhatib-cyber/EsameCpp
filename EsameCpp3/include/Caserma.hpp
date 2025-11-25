@@ -5,6 +5,7 @@
 #include "Mezzo.hpp"
 #include "Missione.hpp"
 #include <vector>
+#include <map>
 #include <memory>
 
 class Caserma {
@@ -22,7 +23,8 @@ public:
     void aggiungiMezzo(std::unique_ptr<Mezzo> m);
     void creaMissione(const std::string& descrizione,
                       const std::vector<int>& idPersonale,
-                      const std::vector<int>& idMezzi);
+                      const std::vector<int>& idMezzi,
+                      const std::map<int, std::vector<int>>& assegnamentiMezzi);
 
     void mostraPersonale() const;
     void mostraMezzi() const;
