@@ -5,6 +5,7 @@
 #include "Mezzo.hpp"
 #include <string>
 #include <vector>
+#include <map>
 #include <memory>
 class Missione {
 private:
@@ -12,12 +13,14 @@ private:
     std::string descrizione;
     std::vector<Personale*> personaleAssegnato;
     std::vector<Mezzo*> mezziAssegnati;
+    std::map<Mezzo*, std::vector<Personale*>> personalePerMezzo;
 
 public:
     Missione(int id, const std::string& descrizione);
 
     void assegnaPersonale(Personale* p);
     void assegnaMezzo(Mezzo* m);
+    void assegnaPersonalealMezzo(Personale* p, Mezzo* m);
 
     void mostraDettagli() const;
 };

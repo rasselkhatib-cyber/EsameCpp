@@ -1,14 +1,15 @@
 #include "../include/Personale.hpp"
 
-// Chiama il costruttore di Risorsa(id)
+// Chiama il costruttore di Risorsa(id) nella initializer list
 Personale::Personale(int id, const std::string& nome, Grado grado)
-    : Risorsa(id), nome(nome), grado(grado) {}
+    : Risorsa(id), nome(nome), grado(grado) 
+{
+    // Il corpo del costruttore può essere vuoto
+}
 
-// I metodi getId(), isDisponibile(), setDisponibile() sono stati rimossi e sono ereditati.
-//int Personale::getId() const { return Risorsa::getId(); } // Opzionale: puoi lasciare solo getNome(), getGrado(), etc.
 std::string Personale::getNome() const { return nome; }
+
 Grado Personale::getGrado() const { return grado; }
-// ... il resto del codice è invariato
 
 std::string Personale::gradoToString() const {
         
